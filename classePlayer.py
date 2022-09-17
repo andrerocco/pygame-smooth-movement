@@ -5,7 +5,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # Atributos padrões
-        self.image = pygame.Surface((20,40))
+        self.image = pygame.Surface((27,54))
         self.image.fill('red')
         self.rect = self.image.get_rect(midbottom=position)
 
@@ -105,18 +105,20 @@ class Player(pygame.sprite.Sprite):
         # Aplica a fricção na aceleração horizontal
         self.apply_friction()
 
+        return self.speed
 
-    def move(self):
+    def move(self, delta_speed):
+        dx, dy = delta_speed
+
         # Movimento x
-        self.precise_rect_position_x += self.speed.x # A posição precisa será float
+        self.precise_rect_position_x += dx # A posição precisa será float
         self.rect.x = int(self.precise_rect_position_x) # A posição recebida pelo retângulo precisa ser inteira para posicionar o pixel
 
         # Movimento y
-        self.rect.y += self.speed.y
+        self.rect.y += dy
 
-    def update(self, event_listener): # Calcula o movimento baseado nos inputs
-        self.calculate_speed(event_listener)
-        self.move()
+    def update(self, delta_speed): # Calcula o movimento baseado nos inputs
+        self.move(delta_speed)
 
 
     # Setters

@@ -1,4 +1,4 @@
-from turtle import speed
+from turtle import position, speed
 import pygame
 import config
 from classeTile import Tile
@@ -37,47 +37,42 @@ class Level:
                     # Gera o jogador usando a classe Player e enviando a posição inicial
                     player_sprite = Player((player_origin_x, player_origin_y)) 
                     self.player.add(player_sprite)
+    
+    def handle_collisions(self, player, delta_speed):
+        dx, dy = delta_speed
 
-    def horizontal_player_collision(self):
-        ...
+        for tile in self.level_tiles.sprites():
+            if tile.rect.colliderect(player.rect.x + dx, player.rect.y, player.rect.width, player.rect.height): # Testa a colisão do deslocamento horizontal
+                if player.speed.x > 0: # Caso o jogador colida com um superfície pela direita
+                    dx = tile.rect.left - player.rect.right
+                elif player.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
+                    dx = tile.rect.right - player.rect.left
 
-    def vertical_player_collision(self, player):
-        bottom_colision = 0
-
-        for tile in self.level_tiles:
-            if tile.rect.colliderect(player):
-                if player.speed.y > 0: # Se o jogador estiver caindo
-                    player.speed.y = 0
+            if tile.rect.colliderect(player.rect.x, player.rect.y + dy, player.rect.width, player.rect.height): # Testa a colisão do deslocamento vertical
+                if player.speed.y > 0 and not(tile.rect.bottom <= player.rect.bottom): # Caso o jogador colida com um superfície pela parte de cima
+                    dy = (tile.rect.top - player.rect.bottom)
+                    player.speed.y = 0 # Reinicia a gravidade
                     player.set_jumping_status(False)
                     player.set_on_ground_status(True)
-                    player.rect.bottom = tile.rect.top
-
-                    bottom_colision += 1
                 
-                elif player.speed.y < 0: # Se o jogador estiver subindo
-                    player.speed.y = 0
-                    player.rect.top = tile.rect.bottom
-                
-                else:
-                    player.set_jumping_status(False)
-                    player.set_on_ground_status(True)
-        
-        if bottom_colision == 0:
-            player.set_on_ground_status(False)
+                if player.speed.y < 0 and not(tile.rect.top >= player.rect.bottom): # Caso o jogador colida com um superfície pela parte de baixo
+                    dy = (tile.rect.bottom - player.rect.top)
+                    player.speed.y = 0 # Reinicia a gravidade  
 
-
+        return (dx, dy) 
 
 
     def run(self, event_listener):
         player = self.player.sprite
 
-        player.update(event_listener)
-        self.vertical_player_collision(player)
+        # Calcula o deslocamento do jogador baseado nos inputs
+        delta_speed = player.calculate_speed(event_listener)
         
+        # Verifica possíveis colisões no deslocamento calculado e transforma os valores
+        collided_delta_speed = self.handle_collisions(player, delta_speed)
         
-        #player.reposition()
-        #self.horizontal_player_collision()
-        #self.player.sprite.apply_speed()
+        # Aplica o deslocamento final no jogador
+        player.update(collided_delta_speed)
 
         # Draw
         self.player.draw(self.display_surface)

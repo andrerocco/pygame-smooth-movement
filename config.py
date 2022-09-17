@@ -12,7 +12,7 @@ levels = {
 '                         ',
 '         X               ',
 '                         ',
-' X          P            ',
+' X          P       XX   ',
 'XXXXXXXXXXXXXXXXXXXXXXXXX'
     ]
 }
