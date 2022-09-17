@@ -42,6 +42,8 @@ class Level:
         ...
 
     def vertical_player_collision(self, player):
+        bottom_colision = 0
+
         for tile in self.level_tiles:
             if tile.rect.colliderect(player):
                 if player.speed.y > 0: # Se o jogador estiver caindo
@@ -49,10 +51,19 @@ class Level:
                     player.set_jumping_status(False)
                     player.set_on_ground_status(True)
                     player.rect.bottom = tile.rect.top
+
+                    bottom_colision += 1
                 
                 elif player.speed.y < 0: # Se o jogador estiver subindo
                     player.speed.y = 0
                     player.rect.top = tile.rect.bottom
+                
+                else:
+                    player.set_jumping_status(False)
+                    player.set_on_ground_status(True)
+        
+        if bottom_colision == 0:
+            player.set_on_ground_status(False)
 
 
 

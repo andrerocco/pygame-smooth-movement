@@ -17,14 +17,15 @@ class Player(pygame.sprite.Sprite):
 
         self.knockback_speed = pygame.Vector2(0, 0)
         self.walking_speed = 0
-        self.max_walking_speed = 4
+        self.max_walking_speed = 5
 
         # Acelerações
         self.gravity = 0.5
         self.acceleration = pygame.Vector2(0, self.gravity)
         self.input_strength = 0.6 # Altera a força do input do jogador
-        self.friction = 0.75 # Desaceleração do jogador em porcentagem
-        self.knockback_strength = 20 # Altera a força do knockback
+        self.ground_friction = 0.75 # Desaceleração do chão em porcentagem
+        self.air_friction = 0.98 # Desaceleração do ar em porcentagem
+        self.knockback_strength = 13 # Altera a força do knockback
         self.jump_strength = 8 # Altera a força do pulo
 
         # Atributos de input
@@ -34,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.jumping_status = False
         self.on_ground_status = True
         self.facing_right_status = True
+        self.contador = 0
 
 
     def jump(self):
@@ -55,29 +57,33 @@ class Player(pygame.sprite.Sprite):
         # Se o jogador não estiver pressionando esquerda ou direita
         if not (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and not (keys[pygame.K_LEFT] or keys[pygame.K_a]):
             self.thrust = 0
-        
-        self.acceleration.x += (self.input_strength * self.thrust)
+
+        self.acceleration.x = (self.input_strength * self.thrust)
 
         # Movimento vertical
         if (keys[pygame.K_UP] or keys[pygame.K_w]) and self.jumping_status is False:
             self.jump()
 
     def apply_accceleration(self):
-        self.walking_speed += self.acceleration.x
-        self.acceleration.x = 0
+        temp_speed_result = self.speed.x + self.acceleration.x
 
-        if self.walking_speed > self.max_walking_speed: # Se a velocidade for maior que a velocidade máxima
-            self.walking_speed = self.max_walking_speed
-        elif self.walking_speed < -self.max_walking_speed: # Se a velocidade for menor que o valor negativo da velocidade máxima
-            self.walking_speed = -self.max_walking_speed
+        # Se a velocidade for maior que a máxima de caminhada e o jogador estiver pressionando a tecla de movimento na mesma direção, não entra na condição
+        if not (temp_speed_result > self.max_walking_speed and self.thrust == 1) and not (temp_speed_result < -self.max_walking_speed and self.thrust == -1):
+            self.speed.x += self.acceleration.x
+        
+        # Aplica a aceleração da gravidade
+        self.speed.y += self.acceleration.y
 
     def apply_friction(self):
-        if self.thrust == 0: # Se o jogador não estiver pressionando esquerda ou direita aplica a frição na valocidade da caminhada
-            self.walking_speed = int(self.walking_speed * self.friction * 1000)/1000 # Arredonda para 4 pontos de precisão
+        #print("Acceleration: ", self.acceleration.x)
+        #print("Speed: {} - Max speed: {}".format(self.speed.x, self.max_walking_speed))
+        if self.on_ground_status and self.thrust == 0:
+            self.speed.x = int(self.speed.x * self.ground_friction * 1000)/1000 # Arredonda para 4 pontos de precisão
+        elif self.on_ground_status and abs(self.speed.x) > self.max_walking_speed:
+            self.speed.x = int(self.speed.x * self.ground_friction * 1000)/1000 # Arredonda para 4 pontos de precisão
 
-        # Aplica a fricção na velocidade do knockback
-        if self.on_ground_status is True: # Caso o jogador estiver no ar (menos resistência)
-            self.knockback_speed.x = int(self.knockback_speed.x * 0.97 * 1000)/1000 # Arredonda para 4 pontos de precisão
+        if not self.on_ground_status:
+            self.speed.x = int(self.speed.x * self.air_friction * 1000)/1000 # Arredonda para 4 pontos de precisão
 
 
     def knockback(self, target_position):
@@ -85,12 +91,10 @@ class Player(pygame.sprite.Sprite):
 
         # Calcula a direção do knockback
         direction = pygame.Vector2(target_position) - pygame.Vector2(self.rect.center)
-        print(direction)
         direction = direction.normalize()
-        print(direction)
 
         # Aplica o knockback
-        self.knockback_speed = -(direction * self.knockback_strength)
+        self.speed = -(direction * self.knockback_strength)
 
 
     def calculate_speed(self, event_listener):
@@ -98,13 +102,17 @@ class Player(pygame.sprite.Sprite):
         for event in event_listener:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.knockback(pygame.mouse.get_pos())
-                self.speed.y += self.knockback_speed.y
-        
+
+        self.contador += 1
+        if self.contador == 10:
+            print(self.speed.x)
+            self.contador = 0
+
         # Aplica a aceleração do input
         self.movement_input() # Muda os valores de aceleração
         self.apply_accceleration() # Aplica a aceleração ao vetor de velocidade
 
-        # Aplica a fricção nos movimentos horizontais
+        # Aplica a fricção na aceleração horizontal
         self.apply_friction()
 
 
@@ -116,12 +124,10 @@ class Player(pygame.sprite.Sprite):
 
     def move(self):
         # Movimento x
-        self.speed.x = self.walking_speed + self.knockback_speed.x # A velocidade resultante é a soma da velocidade de caminhada e da velocidade de knockback
         self.precise_rect_position_x += self.speed.x # A posição precisa será float
         self.rect.x = int(self.precise_rect_position_x) # A posição recebida pelo retângulo precisa ser inteira para posicionar o pixel
 
         # Movimento y
-        self.speed.y += self.gravity # Aplica a aceleração da gravidade
         self.rect.y += self.speed.y
 
 
