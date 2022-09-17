@@ -82,7 +82,6 @@ class Player(pygame.sprite.Sprite):
         if not self.on_ground_status:
             self.speed.x = int(self.speed.x * self.air_friction * 1000)/1000 # Arredonda para 4 pontos de precisão
 
-
     def knockback(self, target_position):
         self.on_ground_status = False
 
@@ -92,7 +91,6 @@ class Player(pygame.sprite.Sprite):
 
         # Aplica o knockback
         self.speed = -(direction * self.knockback_strength)
-
 
     def calculate_speed(self, event_listener):
         # Se o jogador atirar uma flecha e tiver flechas disponíveis
@@ -108,12 +106,6 @@ class Player(pygame.sprite.Sprite):
         self.apply_friction()
 
 
-
-    def update(self, event_listener): # Calcula o movimento baseado nos inputs
-        self.calculate_speed(event_listener)
-        self.move()
-
-
     def move(self):
         # Movimento x
         self.precise_rect_position_x += self.speed.x # A posição precisa será float
@@ -122,6 +114,9 @@ class Player(pygame.sprite.Sprite):
         # Movimento y
         self.rect.y += self.speed.y
 
+    def update(self, event_listener): # Calcula o movimento baseado nos inputs
+        self.calculate_speed(event_listener)
+        self.move()
 
 
     # Setters
