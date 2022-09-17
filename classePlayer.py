@@ -35,7 +35,6 @@ class Player(pygame.sprite.Sprite):
         self.jumping_status = False
         self.on_ground_status = True
         self.facing_right_status = True
-        self.contador = 0
 
 
     def jump(self):
@@ -75,8 +74,6 @@ class Player(pygame.sprite.Sprite):
         self.speed.y += self.acceleration.y
 
     def apply_friction(self):
-        #print("Acceleration: ", self.acceleration.x)
-        #print("Speed: {} - Max speed: {}".format(self.speed.x, self.max_walking_speed))
         if self.on_ground_status and self.thrust == 0:
             self.speed.x = int(self.speed.x * self.ground_friction * 1000)/1000 # Arredonda para 4 pontos de precisão
         elif self.on_ground_status and abs(self.speed.x) > self.max_walking_speed:
@@ -102,11 +99,6 @@ class Player(pygame.sprite.Sprite):
         for event in event_listener:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.knockback(pygame.mouse.get_pos())
-
-        self.contador += 1
-        if self.contador == 10:
-            print(self.speed.x)
-            self.contador = 0
 
         # Aplica a aceleração do input
         self.movement_input() # Muda os valores de aceleração
