@@ -42,12 +42,14 @@ class Level:
         dx, dy = delta_speed
 
         for tile in self.level_tiles.sprites():
+            # Colisão horizontal
             if tile.rect.colliderect(player.rect.x + dx, player.rect.y, player.rect.width, player.rect.height): # Testa a colisão do deslocamento horizontal
                 if player.speed.x > 0: # Caso o jogador colida com um superfície pela direita
                     dx = tile.rect.left - player.rect.right
                 elif player.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
                     dx = tile.rect.right - player.rect.left
 
+            # Colisão vertical
             if tile.rect.colliderect(player.rect.x, player.rect.y + dy, player.rect.width, player.rect.height): # Testa a colisão do deslocamento vertical
                 if player.speed.y > 0 and not(tile.rect.bottom <= player.rect.bottom): # Caso o jogador colida com um superfície pela parte de cima
                     dy = (tile.rect.top - player.rect.bottom)
