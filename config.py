@@ -8,11 +8,11 @@ levels = {
 '                         ',
 '                         ',
 '                         ',
-'                         ',
-'                         ',
-'         X               ',
-'                         ',
-' X          P       XX   ',
+'     X             X     ',
+'    X               X    ',
+'    X      X        X    ',
+'     X             X     ',
+' XX         P         XX ',
 'XXXXXXXXXXXXXXXXXXXXXXXXX'
     ]
 }
