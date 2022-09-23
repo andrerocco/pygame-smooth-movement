@@ -38,7 +38,7 @@ class Level:
                     player_sprite = Player((player_origin_x, player_origin_y)) 
                     self.player.add(player_sprite)
     
-    def handle_collisions(self, player, delta_speed):
+    def handle_player_collision(self, player, delta_speed):
         dx, dy = delta_speed
 
         for tile in self.level_tiles.sprites():
@@ -71,7 +71,7 @@ class Level:
         delta_speed = player.calculate_speed(event_listener)
         
         # Verifica possíveis colisões no deslocamento calculado e transforma os valores
-        collided_delta_speed = self.handle_collisions(player, delta_speed)
+        collided_delta_speed = self.handle_player_collision(player, delta_speed)
         
         # Aplica o deslocamento final no jogador
         player.update(collided_delta_speed)
