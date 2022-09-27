@@ -44,22 +44,27 @@ class Level:
         for tile in self.level_tiles.sprites():
             # Colisão horizontal
             if tile.rect.colliderect(player.rect.x + dx, player.rect.y, player.rect.width, player.rect.height): # Testa a colisão do deslocamento horizontal
-                if player.speed.x > 0: # Caso o jogador colida com um superfície pela direita
-                    dx = tile.rect.left - player.rect.right
-                elif player.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
+                if player.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
                     dx = tile.rect.right - player.rect.left
+                    #player.speed.x = 0
+                elif player.speed.x > 0: # Caso o jogador colida com um superfície pela direita
+                    dx = tile.rect.left - player.rect.right
+                    #player.speed.x = 0
+                else:
+                    dx = 0
 
             # Colisão vertical
             if tile.rect.colliderect(player.rect.x, player.rect.y + dy, player.rect.width, player.rect.height): # Testa a colisão do deslocamento vertical
-                if player.speed.y > 0 and not(tile.rect.bottom <= player.rect.bottom): # Caso o jogador colida com um superfície pela parte de cima
-                    dy = (tile.rect.top - player.rect.bottom)
+                if player.speed.y < 0 and (tile.rect.bottom <= player.rect.top): # Jogador "subindo"
+                    dy = (tile.rect.bottom - player.rect.top)
                     player.speed.y = 0 # Reinicia a gravidade
+                if player.speed.y > 0 and (tile.rect.top >= player.rect.bottom): # Jogador "caindo"
+                    dy = (tile.rect.top - player.rect.bottom)
+                    player.speed.y = 0 # Reinicia a gravidade  
                     player.set_jumping_status(False)
                     player.set_on_ground_status(True)
-                
-                if player.speed.y < 0 and not(tile.rect.top >= player.rect.bottom): # Caso o jogador colida com um superfície pela parte de baixo
-                    dy = (tile.rect.bottom - player.rect.top)
-                    player.speed.y = 0 # Reinicia a gravidade  
+                else:
+                    dy = 0
 
         return (dx, dy) 
 
@@ -72,6 +77,7 @@ class Level:
         
         # Verifica possíveis colisões no deslocamento calculado e transforma os valores
         collided_delta_speed = self.handle_player_collision(player, delta_speed)
+        #print(collided_delta_speed)
         
         # Aplica o deslocamento final no jogador
         player.update(collided_delta_speed)
