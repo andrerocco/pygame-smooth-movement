@@ -22,10 +22,12 @@ class Player(pygame.sprite.Sprite):
         # Acelerações
         self.gravity = 0.5
         self.acceleration = pygame.Vector2(0, self.gravity)
-        self.input_strength = 0.6 # Altera a força do input do jogador
         self.ground_friction = 0.75 # Desaceleração do chão em porcentagem
         self.air_friction = 0.98 # Desaceleração do ar em porcentagem
-        self.knockback_strength = 13 # Altera a força do knockback
+        
+        # Forças
+        self.input_strength = 0.6 # Altera a força do input do jogador
+        self.knockback_strength = 15 # Altera a força do knockback
         self.jump_strength = 8 # Altera a força do pulo
 
         # Atributos de input
@@ -34,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         # Atributos de estado
         self.jumping_status = False
         self.on_ground_status = True
-        self.facing_right_status = True
+        self.facing_right_status = True # Utilizado para definir a direção da textura do jogador
 
 
     def jump(self):

@@ -46,10 +46,8 @@ class Level:
             if tile.rect.colliderect(player.rect.x + dx, player.rect.y, player.rect.width, player.rect.height): # Testa a colisão do deslocamento horizontal
                 if player.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
                     dx = tile.rect.right - player.rect.left
-                    #player.speed.x = 0
                 elif player.speed.x > 0: # Caso o jogador colida com um superfície pela direita
                     dx = tile.rect.left - player.rect.right
-                    #player.speed.x = 0
                 else:
                     dx = 0
 
@@ -72,12 +70,11 @@ class Level:
     def run(self, event_listener):
         player = self.player.sprite
 
-        # Calcula o deslocamento do jogador baseado nos inputs
+        # A variável delta_speed é uma tupla com os valores de deslocamento calculados baseados no player
         delta_speed = player.calculate_speed(event_listener)
         
-        # Verifica possíveis colisões no deslocamento calculado e transforma os valores
+        # A variável collided_delta_speed é uma tupla com os valores de deslocamento transformados a partir das colisões
         collided_delta_speed = self.handle_player_collision(player, delta_speed)
-        #print(collided_delta_speed)
         
         # Aplica o deslocamento final no jogador
         player.update(collided_delta_speed)
