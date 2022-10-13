@@ -38,31 +38,32 @@ class Level:
                     player_sprite = Player((player_origin_x, player_origin_y)) 
                     self.player.add(player_sprite)
     
-    # Recebe o sprite group que irá ser colidido, objeto que irá colidir e a próxima posição do objeto calculada
+    # Recebe o objeto que irá colidir, a próxima posição do objeto e o sprite group que irá ser colidido
     # Colide a próxima posição do objeto e retorna a nova posição colidida em uma tupla (collided_dx, collided_dy)
-    def collide(self, player, delta_speed) -> tuple:
-        dx, dy = delta_speed
+    def get_collided_position(self, object, next_position: tuple, collide_with: pygame.sprite.Group) -> tuple:
+        dx, dy = next_position
 
-        for tile in self.level_tiles.sprites():
+        for tile in collide_with.sprites():
             # Colisão horizontal
-            if tile.rect.colliderect(player.rect.x + dx, player.rect.y, player.rect.width, player.rect.height): # Testa a colisão do deslocamento horizontal
-                if player.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
-                    dx = tile.rect.right - player.rect.left
-                elif player.speed.x > 0: # Caso o jogador colida com um superfície pela direita
-                    dx = tile.rect.left - player.rect.right
+            if tile.rect.colliderect(object.rect.x + dx, object.rect.y, object.rect.width, object.rect.height): # Testa a colisão do deslocamento horizontal
+                if object.speed.x < 0: # Caso o jogador colida com um superfície pela esquerda
+                    dx = tile.rect.right - object.rect.left
+                elif object.speed.x > 0: # Caso o jogador colida com um superfície pela direita
+                    dx = tile.rect.left - object.rect.right
                 else:
                     dx = 0
 
             # Colisão vertical
-            if tile.rect.colliderect(player.rect.x, player.rect.y + dy, player.rect.width, player.rect.height): # Testa a colisão do deslocamento vertical
-                if player.speed.y < 0 and (tile.rect.bottom <= player.rect.top): # Jogador "subindo"
-                    dy = (tile.rect.bottom - player.rect.top)
-                    player.speed.y = 0 # Reinicia a gravidade
-                if player.speed.y > 0 and (tile.rect.top >= player.rect.bottom): # Jogador "caindo"
-                    dy = (tile.rect.top - player.rect.bottom)
-                    player.speed.y = 0 # Reinicia a gravidade  
-                    player.set_jumping_status(False)
-                    player.set_on_ground_status(True)
+            if tile.rect.colliderect(object.rect.x, object.rect.y + dy, object.rect.width, object.rect.height): # Testa a colisão do deslocamento vertical
+                if object.speed.y < 0 and (tile.rect.bottom <= object.rect.top): # Jogador "subindo"
+                    dy = (tile.rect.bottom - object.rect.top)
+                    object.speed.y = 0 # Reinicia a gravidade
+                if object.speed.y > 0 and (tile.rect.top >= object.rect.bottom): # Jogador "caindo"
+                    dy = (tile.rect.top - object.rect.bottom)
+                    object.speed.y = 0 # Reinicia a gravidade  
+                    if isinstance(object, Player):
+                        object.set_jumping_status(False)
+                        object.set_on_ground_status(True)
                 else:
                     dy = 0
 
@@ -76,7 +77,7 @@ class Level:
         delta_speed = player.calculate_speed(event_listener)
         
         # A variável collided_delta_speed é uma tupla com os valores de deslocamento transformados a partir das colisões
-        collided_delta_speed = self.collide(player, delta_speed)
+        collided_delta_speed = self.get_collided_position(player, delta_speed, self.level_tiles)
         
         # Aplica o deslocamento final no jogador
         player.update(collided_delta_speed)
