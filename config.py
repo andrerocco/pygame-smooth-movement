@@ -3,6 +3,19 @@ from turtle import screensize
 
 levels = {
     1 : [
+'XXXXXXXXXXXXXXXXXXXXXXXXX',
+'X                X      X',
+'X                X      X',
+'XXXX             X      X',
+'X                X      X',
+'X        XX      X      X',
+'X        X       X      X',
+'X        X              X',
+'X        X              X',
+'X   P    X              X',
+'XXXXXXXXXXXXXXXXXXXXXXXXX'
+    ],
+    2 : [
 '                         ',
 '                         ',
 '                         ',
