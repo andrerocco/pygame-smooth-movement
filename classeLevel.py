@@ -76,7 +76,7 @@ class Level:
         delta_speed = player.calculate_speed(event_listener)
         
         # A variável collided_delta_speed é uma tupla com os valores de deslocamento transformados a partir das colisões
-        collided_delta_speed = self.handle_player_collision(player, delta_speed)
+        collided_delta_speed = self.collide(player, delta_speed)
         
         # Aplica o deslocamento final no jogador
         player.update(collided_delta_speed)
