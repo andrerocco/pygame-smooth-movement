@@ -38,7 +38,9 @@ class Level:
                     player_sprite = Player((player_origin_x, player_origin_y)) 
                     self.player.add(player_sprite)
     
-    def handle_player_collision(self, player, delta_speed):
+    # Recebe o sprite group que irá ser colidido, objeto que irá colidir e a próxima posição do objeto calculada
+    # Colide a próxima posição do objeto e retorna a nova posição colidida em uma tupla (collided_dx, collided_dy)
+    def collide(self, player, delta_speed) -> tuple:
         dx, dy = delta_speed
 
         for tile in self.level_tiles.sprites():
@@ -64,7 +66,7 @@ class Level:
                 else:
                     dy = 0
 
-        return (dx, dy) 
+        return (dx, dy) # Retorna as posições colididas com o sprite group passado como argumento
 
 
     def run(self, event_listener):
